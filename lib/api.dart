@@ -84,9 +84,7 @@ class Meeting {
     var meetingMap = json['meeting']['Meeting'];
     dynamic externalMeetingId;
 
-    if (meetingMap['ExternalMeetingId'] != null) {
-      externalMeetingId = meetingMap['ExternalMeetingId'];
-    }
+    externalMeetingId = meetingMap['ExternalMeetingId'] ?? '';
 
     return Meeting(
       meetingMap['MeetingId'],

@@ -140,6 +140,11 @@ class JoinMeetingView extends StatelessWidget {
             bool isMeetingJoined = await joinMeetingProvider.joinMeeting(
                 meetingProvider, methodChannelProvider, hashRoom);
             if (isMeetingJoined) {
+              final lastDeviceAudio = meetingProvider.deviceList.last;
+
+              if (lastDeviceAudio != null) {
+                meetingProvider.updateCurrentDevice(lastDeviceAudio);
+              }
               // ignore: use_build_context_synchronously
               Navigator.push(
                 context,
