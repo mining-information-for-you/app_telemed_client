@@ -31,10 +31,11 @@ class MyApp extends StatelessWidget {
           }
         },
         child: MaterialApp(
-          title: 'Amazon Chime SDK Flutter Demo',
+          title: 'Telemed - MVP',
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
+          debugShowCheckedModeBanner: false,
           routes: {
             '/joinMeeting': (_) => JoinMeetingView(),
             '/meeting': (_) => const MeetingView(),

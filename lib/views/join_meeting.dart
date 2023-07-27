@@ -20,8 +20,13 @@ class JoinMeetingView extends StatelessWidget {
 
     final orientation = MediaQuery.of(context).orientation;
 
-    return joinMeetingBody(joinMeetingProvider, methodChannelProvider,
-        meetingProvider, context, orientation);
+    return joinMeetingBody(
+      joinMeetingProvider,
+      methodChannelProvider,
+      meetingProvider,
+      context,
+      orientation,
+    );
   }
 
 //
@@ -53,23 +58,42 @@ class JoinMeetingView extends StatelessWidget {
       MeetingViewModel meetingProvider,
       BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('MI4U'),
-      ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            titleFlutterDemo(5),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 10),
-              child: hashRoomTextField(hashRoomTEC),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.blue.withAlpha(500),
+                Colors.greenAccent,
+              ],
             ),
-            joinButton(joinMeetingProvider, methodChannelProvider,
-                meetingProvider, context),
-            loadingIcon(joinMeetingProvider),
-            errorMessage(joinMeetingProvider),
-          ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                titleFlutterDemo(5),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 10,
+                  ),
+                  child: hashRoomTextField(hashRoomTEC),
+                ),
+                joinButton(
+                  joinMeetingProvider,
+                  methodChannelProvider,
+                  meetingProvider,
+                  context,
+                ),
+                loadingIcon(joinMeetingProvider),
+                errorMessage(joinMeetingProvider),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -120,7 +144,16 @@ class JoinMeetingView extends StatelessWidget {
       MeetingViewModel meetingProvider,
       BuildContext context) {
     return ElevatedButton(
-      child: const Text("Entrar"),
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      child: const Text(
+        "Entrar",
+        style: TextStyle(
+          fontSize: 18,
+        ),
+      ),
       onPressed: () async {
         if (!joinMeetingProvider.joinButtonClicked) {
           // Prevent multiple clicks
@@ -163,22 +196,53 @@ class JoinMeetingView extends StatelessWidget {
   Widget titleFlutterDemo(double pad) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: pad),
-      child: const Text(
-        "Telemed",
-        style: TextStyle(
-          fontSize: 32,
-          color: Colors.blue,
-        ),
+      child: const Column(
+        children: [
+          Text(
+            "Tele-consulta",
+            style: TextStyle(
+              fontSize: 40,
+              color: Colors.white,
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(left: 24, right: 24, top: 82),
+            child: Text(
+              "Entre com o código da sala para ter sua consulta",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget hashRoomTextField(hashRoomTEC) {
-    return TextField(
-      controller: hashRoomTEC,
-      decoration: const InputDecoration(
-        labelText: "Código da sala",
-        border: OutlineInputBorder(),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: TextField(
+        controller: hashRoomTEC,
+        style: const TextStyle(
+          color: Colors.white,
+        ),
+        decoration: const InputDecoration(
+          labelText: "Código da sala",
+          labelStyle: TextStyle(
+            color: Colors.white,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(width: 2, color: Colors.white),
+            borderRadius: BorderRadius.all(Radius.circular(12)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(width: 2, color: Colors.white),
+            borderRadius: BorderRadius.all(Radius.circular(12)),
+          ),
+        ),
       ),
     );
   }
