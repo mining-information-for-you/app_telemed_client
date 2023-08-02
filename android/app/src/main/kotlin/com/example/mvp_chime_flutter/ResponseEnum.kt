@@ -21,6 +21,9 @@ enum class Response(val msg: String) {
 
     // Video
     local_video_on_success("Android: Started local video."),
+    video_device_updated("Android: Video device updated"),
+    video_device_update_failed("Android: Failed to update video device."),
+    null_video_device("Android: ERROR received null as video device."),
 
     // Audio Device
     audio_device_updated("Android: Audio device updated"),

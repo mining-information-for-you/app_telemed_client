@@ -297,6 +297,28 @@ class MeetingViewModel extends ChangeNotifier
     }
   }
 
+  void toggleLocalVideoTile() async {
+    if (!currAttendees.containsKey(localAttendeeId)) {
+      logger.e("Local attendee not found");
+      return;
+    }
+
+    if (currAttendees[localAttendeeId]!.isVideoOn) {
+      MethodChannelResponse? switchCamera = await methodChannelProvider
+          ?.callMethod(MethodCallOption.switchLocalVideo);
+      if (switchCamera == null) {
+        logger.e(Response.video_start_response_null);
+        return;
+      }
+
+      if (switchCamera.result) {
+        logger.i(switchCamera.arguments);
+      } else {
+        logger.e(switchCamera.arguments);
+      }
+    }
+  }
+
   void stopMeeting() async {
     MethodChannelResponse? stopResponse =
         await methodChannelProvider?.callMethod(MethodCallOption.stop);

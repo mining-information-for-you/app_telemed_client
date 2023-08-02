@@ -71,6 +71,9 @@ class MethodChannelCoordinator(binaryMessenger: BinaryMessenger, activity: Activ
                 MethodCallFlutter.updateAudioDevice.call -> {
                     callResult = updateAudioDevice(call)
                 }
+                MethodCallFlutter.switchCamera.call -> {
+                    callResult = switchCamera()
+                }
                 else -> callResult = MethodChannelResult(false, Response.method_not_implemented)
             }
 
@@ -206,5 +209,13 @@ class MethodChannelCoordinator(binaryMessenger: BinaryMessenger, activity: Activ
             }
         }
         return MethodChannelResult(false, Response.audio_device_update_failed.msg)
+    }
+
+    fun switchCamera(): MethodChannelResult {
+        val device =
+            MeetingSessionManager.meetingSession?.audioVideo?.switchCamera()
+                ?: return NULL_MEETING_SESSION_RESPONSE
+
+        return MethodChannelResult(true, Response.video_device_updated.msg)
     }
 }

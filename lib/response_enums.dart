@@ -64,6 +64,7 @@ class MethodCallOption {
   static const String unmute = "unmute";
   static const String localVideoOn = "startLocalVideo";
   static const String localVideoOff = "stopLocalVideo";
+  static const String switchLocalVideo = "switchCamera";
   static const String videoTileAdd = "videoTileAdd";
   static const String videoTileRemove = "videoTileRemove";
   static const String listAudioDevices = "listAudioDevices";

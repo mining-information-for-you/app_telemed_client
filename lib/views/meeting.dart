@@ -83,7 +83,6 @@ class _MeetingViewState extends State<MeetingView> {
 
   Widget localListInfo(MeetingViewModel meetingProvider, BuildContext context) {
     return Container(
-      width: 200,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -98,7 +97,7 @@ class _MeetingViewState extends State<MeetingView> {
         ],
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.max,
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
@@ -110,6 +109,9 @@ class _MeetingViewState extends State<MeetingView> {
               Navigator.pop(context);
             },
           ),
+          const SizedBox(
+            width: 16,
+          ),
           IconButton(
             icon: Icon(localMuteIcon(meetingProvider)),
             iconSize: 28,
@@ -118,6 +120,9 @@ class _MeetingViewState extends State<MeetingView> {
               meetingProvider.sendLocalMuteToggle();
             },
           ),
+          const SizedBox(
+            width: 16,
+          ),
           IconButton(
             icon: Icon(localVideoIcon(meetingProvider)),
             iconSize: 28,
@@ -125,6 +130,18 @@ class _MeetingViewState extends State<MeetingView> {
             color: Colors.blue,
             onPressed: () {
               meetingProvider.sendLocalVideoTileOn();
+            },
+          ),
+          const SizedBox(
+            width: 16,
+          ),
+          IconButton(
+            icon: const Icon(Icons.cameraswitch_rounded),
+            iconSize: 28,
+            constraints: const BoxConstraints(),
+            color: Colors.blue,
+            onPressed: () {
+              meetingProvider.toggleLocalVideoTile();
             },
           ),
         ],

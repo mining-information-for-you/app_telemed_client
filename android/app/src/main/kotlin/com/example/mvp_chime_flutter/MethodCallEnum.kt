@@ -16,5 +16,6 @@ enum class MethodCall(val call: String) {
     videoTileRemove("videoTileRemove"),
     listAudioDevices("listAudioDevices"),
     updateAudioDevice("updateAudioDevice"),
+    switchCamera("switchCamera"),
     audioSessionDidStop("audioSessionDidStop")
 }
