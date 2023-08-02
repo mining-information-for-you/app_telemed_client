@@ -10,7 +10,6 @@ import 'package:mvp_chime_flutter/views/screenshare.dart';
 import 'package:provider/provider.dart';
 
 import '../logger.dart';
-import 'style.dart';
 
 class MeetingView extends StatelessWidget {
   const MeetingView({Key? key}) : super(key: key);
@@ -25,26 +24,8 @@ class MeetingView extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text("${meetingProvider.meetingId}"),
-        automaticallyImplyLeading: false,
-      ),
-      resizeToAvoidBottomInset: true,
-      body: meetingBody(orientation, meetingProvider, context),
+      body: meetingBodyPortrait(meetingProvider, orientation, context),
     );
-  }
-
-  //
-  // —————————————————————————— Main Body ——————————————————————————————————————
-  //
-
-  Widget meetingBody(Orientation orientation, MeetingViewModel meetingProvider,
-      BuildContext context) {
-    if (orientation == Orientation.portrait) {
-      return meetingBodyPortrait(meetingProvider, orientation, context);
-    } else {
-      return meetingBodyLandscape(meetingProvider, orientation, context);
-    }
   }
 
   //
@@ -53,90 +34,77 @@ class MeetingView extends StatelessWidget {
 
   Widget meetingBodyPortrait(MeetingViewModel meetingProvider,
       Orientation orientation, BuildContext context) {
-    return Center(
-      child: Column(
-        children: [
-          const SizedBox(
-            height: 8,
-          ),
-          Row(
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      children: [
+        SizedBox(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: displayVideoTiles(meetingProvider, orientation, context),
-          ),
-          const Padding(
-            padding: EdgeInsets.only(top: 30, bottom: 20),
-            child: Text(
-              "Attendees",
-              style: TextStyle(fontSize: Style.titleSize),
-              textAlign: TextAlign.center,
+            children: displayVideoTiles(
+              meetingProvider,
+              orientation,
+              context,
             ),
           ),
-          Column(
-            children: displayAttendees(meetingProvider, context),
-          ),
-          WillPopScope(
-            onWillPop: () async {
-              meetingProvider.stopMeeting();
-              return true;
-            },
-            child: const Spacer(),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 50),
-            child: SizedBox(
-              height: 50,
-              width: 300,
-              child: leaveMeetingButton(meetingProvider, context),
-            ),
-          ),
-        ],
-      ),
+        ),
+        WillPopScope(
+          onWillPop: () async {
+            meetingProvider.stopMeeting();
+            return true;
+          },
+          child: const SizedBox(height: 0),
+        ),
+        displayAttendeeLocal(meetingProvider, context),
+      ],
     );
   }
 
-  List<Widget> displayAttendees(
+  Widget displayAttendeeLocal(
       MeetingViewModel meetingProvider, BuildContext context) {
-    List<Widget> attendees = [];
+    Widget attendeeLocal = const SizedBox(height: 0);
     if (meetingProvider.currAttendees
         .containsKey(meetingProvider.localAttendeeId)) {
-      attendees.add(localListInfo(meetingProvider, context));
-    }
-    if (meetingProvider.currAttendees.length > 1) {
-      if (meetingProvider.currAttendees
-          .containsKey(meetingProvider.remoteAttendeeId)) {
-        attendees.add(remoteListInfo(meetingProvider));
-      }
+      attendeeLocal = localListInfo(meetingProvider, context);
     }
 
-    return attendees;
+    return attendeeLocal;
   }
 
   Widget localListInfo(MeetingViewModel meetingProvider, BuildContext context) {
-    return ListTile(
-      title: Text(
-        meetingProvider.formatExternalUserId(meetingProvider
-            .currAttendees[meetingProvider.localAttendeeId]?.externalUserId),
-        style: const TextStyle(
-          color: Colors.black,
-          fontSize: Style.fontSize,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 4),
+      margin: const EdgeInsets.symmetric(horizontal: 24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(18),
+          topRight: Radius.circular(18),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.25),
+            spreadRadius: 2,
+            blurRadius: 6,
+          ),
+        ],
       ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
-            icon: const Icon(Icons.headphones),
-            iconSize: Style.iconSize,
-            color: Colors.blue,
+            icon: const Icon(Icons.phone_disabled),
+            iconSize: 32,
+            color: Colors.red,
             onPressed: () {
-              showAudioDeviceDialog(meetingProvider, context);
+              meetingProvider.stopMeeting();
+              Navigator.pop(context);
             },
           ),
           IconButton(
             icon: Icon(localMuteIcon(meetingProvider)),
-            iconSize: Style.iconSize,
-            padding: EdgeInsets.symmetric(horizontal: Style.iconPadding),
+            iconSize: 32,
             color: Colors.blue,
             onPressed: () {
               meetingProvider.sendLocalMuteToggle();
@@ -144,8 +112,7 @@ class MeetingView extends StatelessWidget {
           ),
           IconButton(
             icon: Icon(localVideoIcon(meetingProvider)),
-            iconSize: Style.iconSize,
-            padding: EdgeInsets.symmetric(horizontal: Style.iconPadding),
+            iconSize: 32,
             constraints: const BoxConstraints(),
             color: Colors.blue,
             onPressed: () {
@@ -153,187 +120,6 @@ class MeetingView extends StatelessWidget {
             },
           ),
         ],
-      ),
-    );
-  }
-
-  Widget remoteListInfo(MeetingViewModel meetingProvider) {
-    return (ListTile(
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: Style.iconPadding),
-            child: Icon(
-              remoteMuteIcon(meetingProvider),
-              size: Style.iconSize,
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: Style.iconPadding),
-            child: Icon(
-              remoteVideoIcon(meetingProvider),
-              size: Style.iconSize,
-            ),
-          ),
-        ],
-      ),
-      title: Text(
-        meetingProvider.formatExternalUserId(meetingProvider
-            .currAttendees[meetingProvider.remoteAttendeeId]?.externalUserId),
-        style: const TextStyle(fontSize: Style.fontSize),
-      ),
-    ));
-  }
-
-  //
-  // —————————————————————————— Landscape Body ——————————————————————————————————————
-  //
-
-  Widget meetingBodyLandscape(MeetingViewModel meetingProvider,
-      Orientation orientation, BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Expanded(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.max,
-            children: displayVideoTiles(meetingProvider, orientation, context),
-          ),
-        ),
-        Expanded(
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(
-                height: 20,
-              ),
-              const Text(
-                "Attendees",
-                style: TextStyle(fontSize: Style.titleSize),
-              ),
-              Column(
-                children: displayAttendeesLanscape(meetingProvider, context),
-              ),
-              WillPopScope(
-                onWillPop: () async {
-                  meetingProvider.stopMeeting();
-                  return true;
-                },
-                child: const Spacer(),
-              ),
-              leaveMeetingButton(meetingProvider, context),
-              const SizedBox(
-                height: 20,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  List<Widget> displayAttendeesLanscape(
-      MeetingViewModel meetingProvider, BuildContext context) {
-    List<Widget> attendees = [];
-    if (meetingProvider.currAttendees
-        .containsKey(meetingProvider.localAttendeeId)) {
-      attendees.add(localListInfoLandscape(meetingProvider, context));
-    }
-    if (meetingProvider.currAttendees.length > 1) {
-      if (meetingProvider.currAttendees
-          .containsKey(meetingProvider.remoteAttendeeId)) {
-        attendees.add(remoteListInfoLandscape(meetingProvider));
-      }
-    }
-
-    return attendees;
-  }
-
-  Widget localListInfoLandscape(
-      MeetingViewModel meetingProvider, BuildContext context) {
-    return SizedBox(
-      width: 500,
-      child: ListTile(
-        title: Text(
-          meetingProvider.formatExternalUserId(meetingProvider
-              .currAttendees[meetingProvider.localAttendeeId]?.externalUserId),
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: Style.fontSize,
-          ),
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.headphones),
-              iconSize: Style.iconSize,
-              color: Colors.blue,
-              onPressed: () {
-                showAudioDeviceDialog(meetingProvider, context);
-              },
-            ),
-            IconButton(
-              icon: Icon(localMuteIcon(meetingProvider)),
-              iconSize: Style.iconSize,
-              padding: EdgeInsets.symmetric(horizontal: Style.iconPadding),
-              color: Colors.blue,
-              onPressed: () {
-                meetingProvider.sendLocalMuteToggle();
-              },
-            ),
-            IconButton(
-              icon: Icon(localVideoIcon(meetingProvider)),
-              iconSize: Style.iconSize,
-              padding: EdgeInsets.symmetric(horizontal: Style.iconPadding),
-              constraints: const BoxConstraints(),
-              color: Colors.blue,
-              onPressed: () {
-                meetingProvider.sendLocalVideoTileOn();
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget remoteListInfoLandscape(MeetingViewModel meetingProvider) {
-    return SizedBox(
-      width: 500,
-      child: ListTile(
-        title: Text(
-          meetingProvider.formatExternalUserId(meetingProvider
-              .currAttendees[meetingProvider.remoteAttendeeId]?.externalUserId),
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: Style.fontSize,
-          ),
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: Style.iconPadding),
-              child: Icon(
-                remoteMuteIcon(meetingProvider),
-                size: Style.iconSize,
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: Style.iconPadding),
-              child: Icon(
-                remoteVideoIcon(meetingProvider),
-                size: Style.iconSize,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -417,11 +203,31 @@ class MeetingView extends StatelessWidget {
 
   List<Widget> displayVideoTiles(MeetingViewModel meetingProvider,
       Orientation orientation, BuildContext context) {
-    Widget screenShareWidget = Expanded(
-        child: videoTile(meetingProvider, context,
-            isLocal: false, isContent: true));
-    Widget localVideoTile =
-        videoTile(meetingProvider, context, isLocal: true, isContent: false);
+    final size = MediaQuery.of(context).size;
+
+    Widget screenShareWidget = Container(
+      child: videoTile(
+        meetingProvider,
+        context,
+        isLocal: false,
+        isContent: true,
+      ),
+    );
+    Widget localVideoTile = SizedBox(
+      width: size.width,
+      height: size.height,
+      child: Expanded(
+        child: FittedBox(
+          fit: BoxFit.cover,
+          child: videoTile(
+            meetingProvider,
+            context,
+            isLocal: true,
+            isContent: false,
+          ),
+        ),
+      ),
+    );
     Widget remoteVideoTile =
         videoTile(meetingProvider, context, isLocal: false, isContent: false);
 
@@ -458,14 +264,28 @@ class MeetingView extends StatelessWidget {
     }
 
     if (videoTiles.isEmpty) {
-      const Widget emptyVideos = Text("No video detected");
+      Widget emptyVideos = Column(
+        children: [
+          const Text(
+            "Sem vídeo aberto",
+            style: TextStyle(
+              fontSize: 24,
+            ),
+          ),
+          Icon(
+            Icons.videocam_off,
+            size: 94,
+            color: Colors.grey.withAlpha(500),
+          )
+        ],
+      );
       if (orientation == Orientation.portrait) {
         videoTiles.add(
           emptyVideos,
         );
       } else {
         videoTiles.add(
-          const Center(
+          Center(
             widthFactor: 2.5,
             child: emptyVideos,
           ),
@@ -605,31 +425,6 @@ class MeetingView extends StatelessWidget {
     );
   }
 
-  void showAudioDeviceDialog(
-      MeetingViewModel meetingProvider, BuildContext context) async {
-    String? device = await showDialog(
-        context: context,
-        builder: (context) {
-          return SimpleDialog(
-            title: const Text("Choose Audio Device"),
-            elevation: 40,
-            titleTextStyle: const TextStyle(
-                color: Colors.black,
-                fontSize: Style.fontSize,
-                fontWeight: FontWeight.bold),
-            backgroundColor: Colors.white,
-            children:
-                getSimpleDialogOptionsAudioDevices(meetingProvider, context),
-          );
-        });
-    if (device == null) {
-      logger.w("No device chosen.");
-      return;
-    }
-
-    meetingProvider.updateCurrentDevice(device);
-  }
-
   List<Widget> getSimpleDialogOptionsAudioDevices(
       MeetingViewModel meetingProvider, BuildContext context) {
     List<Widget> dialogOptions = [];
@@ -655,18 +450,6 @@ class MeetingView extends StatelessWidget {
       );
     }
     return dialogOptions;
-  }
-
-  Widget leaveMeetingButton(
-      MeetingViewModel meetingProvider, BuildContext context) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-      onPressed: () {
-        meetingProvider.stopMeeting();
-        Navigator.pop(context);
-      },
-      child: const Text("Leave Meeting"),
-    );
   }
 
   IconData localMuteIcon(MeetingViewModel meetingProvider) {
