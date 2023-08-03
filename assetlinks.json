@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "mvp_chime_flutter",
+      "package_name": "com.example.mvp_chime_flutter",
+      "sha256_cert_fingerprints": [
+        "50:52:D9:26:E4:DE:B5:59:F4:6F:EC:C0:B1:D5:45:54:D1:FD:02:5E:A1:BA:F3:C3:C3:E3:4B:08:F1:1F:9E:A4"
+      ]
+    }
+  }
+]

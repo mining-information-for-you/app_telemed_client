@@ -36,6 +36,7 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.blue,
           ),
           debugShowCheckedModeBanner: false,
+          initialRoute: '/joinMeeting',
           routes: {
             '/joinMeeting': (_) => JoinMeetingView(),
             '/meeting': (_) => const MeetingView(),

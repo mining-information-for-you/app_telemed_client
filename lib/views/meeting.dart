@@ -149,7 +149,6 @@ class _MeetingViewState extends State<MeetingView> {
     );
   }
 
-  //
   void openFullscreenDialog(
       BuildContext context, int? params, MeetingViewModel meetingProvider) {
     Widget contentTile;
