@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mvp_chime_flutter/view_models/join_meeting_view_model.dart';
 import 'package:mvp_chime_flutter/view_models/meeting_view_model.dart';
 import 'package:mvp_chime_flutter/views/join_meeting.dart';
@@ -30,18 +31,27 @@ class MyApp extends StatelessWidget {
             FocusManager.instance.primaryFocus?.unfocus();
           }
         },
-        child: MaterialApp(
+        child: MaterialApp.router(
           title: 'Telemed - MVP',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-          ),
           debugShowCheckedModeBanner: false,
-          initialRoute: '/joinMeeting',
-          routes: {
-            '/joinMeeting': (_) => JoinMeetingView(),
-            '/meeting': (_) => const MeetingView(),
-          },
-          home: JoinMeetingView(),
+          routerConfig: GoRouter(
+            initialLocation: '/',
+            navigatorKey: GlobalKey<NavigatorState>(),
+            routes: [
+              GoRoute(
+                path: '/',
+                builder: (context, state) => JoinMeetingView(),
+              ),
+              GoRoute(
+                path: '/room/:hashRoom/participant',
+                builder: (context, state) {
+                  String? hashRoom = state.pathParameters['hashRoom'];
+                  return JoinMeetingView(hashRoom: hashRoom);
+                },
+              ),
+              GoRoute(path: '/meeting', builder: (_, __) => const MeetingView())
+            ],
+          ),
         ),
       ),
     );

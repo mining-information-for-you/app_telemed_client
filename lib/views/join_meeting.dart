@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mvp_chime_flutter/method_channel_coordinator.dart';
 import 'package:provider/provider.dart';
 
 import '../view_models/join_meeting_view_model.dart';
 import '../view_models/meeting_view_model.dart';
-import 'meeting.dart';
 
 class JoinMeetingView extends StatelessWidget {
-  JoinMeetingView({Key? key}) : super(key: key);
+  JoinMeetingView({super.key, this.hashRoom});
 
+  final String? hashRoom;
   final TextEditingController hashRoomTEC = TextEditingController();
 
   @override
@@ -19,6 +20,20 @@ class JoinMeetingView extends StatelessWidget {
     final meetingProvider = Provider.of<MeetingViewModel>(context);
 
     final orientation = MediaQuery.of(context).orientation;
+
+    bool alreadyLoadMeeting = false;
+
+    hashRoomTEC.value = TextEditingValue(text: (hashRoom ?? '').trim());
+
+    if (hashRoom != null && !alreadyLoadMeeting) {
+      handleJoinMeeting(
+        joinMeetingProvider,
+        methodChannelProvider,
+        meetingProvider,
+        context,
+      );
+      alreadyLoadMeeting = true;
+    }
 
     return joinMeetingBody(
       joinMeetingProvider,
@@ -155,42 +170,50 @@ class JoinMeetingView extends StatelessWidget {
         ),
       ),
       onPressed: () async {
-        if (!joinMeetingProvider.joinButtonClicked) {
-          // Prevent multiple clicks
-          joinMeetingProvider.joinButtonClicked = true;
+        // Hide Keyboard
+        FocusManager.instance.primaryFocus?.unfocus();
 
-          // Hide Keyboard
-          FocusManager.instance.primaryFocus?.unfocus();
-
-          String hashRoom = hashRoomTEC.text.trim();
-
-          if (joinMeetingProvider.verifyParameters(hashRoom)) {
-            // Observers should be initialized before MethodCallHandler
-            methodChannelProvider.initializeObservers(meetingProvider);
-            methodChannelProvider.initializeMethodCallHandler();
-
-            // Call api, format to JSON and send to native
-            bool isMeetingJoined = await joinMeetingProvider.joinMeeting(
-                meetingProvider, methodChannelProvider, hashRoom);
-            if (isMeetingJoined) {
-              final lastDeviceAudio = meetingProvider.deviceList.last;
-
-              if (lastDeviceAudio != null) {
-                meetingProvider.updateCurrentDevice(lastDeviceAudio);
-              }
-              // ignore: use_build_context_synchronously
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const MeetingView(),
-                ),
-              );
-            }
-          }
-          joinMeetingProvider.joinButtonClicked = false;
-        }
+        handleJoinMeeting(
+          joinMeetingProvider,
+          methodChannelProvider,
+          meetingProvider,
+          context,
+        );
       },
     );
+  }
+
+  void handleJoinMeeting(
+    JoinMeetingViewModel joinMeetingProvider,
+    MethodChannelCoordinator methodChannelProvider,
+    MeetingViewModel meetingProvider,
+    BuildContext context,
+  ) async {
+    String hashRoomToConnect = hashRoom ?? hashRoomTEC.text;
+
+    if (joinMeetingProvider.verifyParameters(hashRoomToConnect)) {
+      joinMeetingProvider.joinButtonClicked = true;
+
+      methodChannelProvider.initializeObservers(meetingProvider);
+      methodChannelProvider.initializeMethodCallHandler();
+
+      bool isMeetingJoined = await joinMeetingProvider.joinMeeting(
+        meetingProvider,
+        methodChannelProvider,
+        hashRoomToConnect,
+      );
+      if (isMeetingJoined) {
+        final lastDeviceAudio = meetingProvider.deviceList.last;
+
+        if (lastDeviceAudio != null) {
+          meetingProvider.updateCurrentDevice(lastDeviceAudio);
+        }
+
+        // ignore: use_build_context_synchronously
+        context.go('/meeting');
+      }
+    }
+    joinMeetingProvider.joinButtonClicked = false;
   }
 
   Widget titleFlutterDemo(double pad) {
