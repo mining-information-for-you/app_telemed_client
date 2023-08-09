@@ -8,16 +8,26 @@ import 'logger.dart';
 class Api {
   final String _baseUrl = ApiConfig.apiUrl;
 
-  Future<ApiResponse?> join(String hashRoom) async {
+  Future<JoinResponse?> join(String tokenCall) async {
+    final responseParticipant = await getParticipantByTokenCall(tokenCall);
+    if (responseParticipant == null) {
+      return JoinResponse(response: false, error: 'not.get.participant');
+    }
+
+    logger.d('DATA HASH_ROOM ${responseParticipant.hashRoom}');
+    logger.d('DATA NAME ${responseParticipant.name}');
+    logger.d('DATA EXTERNAL_ID ${responseParticipant.externalId}');
+
     String url = "$_baseUrl/chime";
 
     try {
       final http.Response response = await http.post(
         Uri.parse(url),
         body: jsonEncode({
-          'externalUserId': '18',
-          'requestId': hashRoom,
-          'nameAttendee': 'Leonardo'
+          // 'externalUserId': responseParticipant.externalId.toString(),
+          'externalUserId': 3,
+          'requestId': responseParticipant.hashRoom,
+          'nameAttendee': responseParticipant.name
         }),
         headers: {
           "Content-type": "application/json",
@@ -32,11 +42,11 @@ class Api {
         logger.i("POST - join api call successful!");
         Map<String, dynamic> joinInfoMap = jsonDecode(response.body);
         JoinInfo joinInfo = JoinInfo.fromJson(joinInfoMap);
-        return ApiResponse(response: true, content: joinInfo);
+        return JoinResponse(response: true, content: joinInfo);
       }
     } catch (e) {
       logger.e("join request Failed. Status: ${e.toString()}");
-      return ApiResponse(response: false, error: e.toString());
+      return JoinResponse(response: false, error: e.toString());
     }
     return null;
   }
@@ -56,6 +66,43 @@ class Api {
     };
 
     return flattenedJSON;
+  }
+
+  Future<ParticipantResponse?> getParticipantByTokenCall(
+      String tokenCall) async {
+    String url = "$_baseUrl/panel/participant/$tokenCall";
+
+    try {
+      final http.Response response = await http.get(
+        Uri.parse(url),
+        headers: {
+          "Content-type": "application/json",
+        },
+      );
+
+      final object = json.decode(response.body);
+      final prettyString = const JsonEncoder.withIndent('  ').convert(object);
+      logger.d('DATA: $prettyString');
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        logger.i("GET - get participant data is success!");
+
+        Map<String, dynamic> participantMap = jsonDecode(response.body);
+        ParticipantInfo participantInfo =
+            ParticipantInfo.fromJson(participantMap);
+
+        return ParticipantResponse(
+          participantInfo.externalId,
+          participantInfo.name,
+          participantInfo.hashRoom,
+          participantInfo.message,
+        );
+      }
+    } catch (e) {
+      logger.e("join request Failed. Status: ${e.toString()}");
+      return null;
+    }
+    return null;
   }
 }
 
@@ -129,10 +176,37 @@ class AttendeeInfo {
   }
 }
 
-class ApiResponse {
+class JoinResponse {
   final bool response;
   final JoinInfo? content;
   final String? error;
 
-  ApiResponse({required this.response, this.content, this.error});
+  JoinResponse({required this.response, this.content, this.error});
+}
+
+class ParticipantInfo {
+  final int externalId;
+  final String name;
+  final String hashRoom;
+  final String? message;
+
+  ParticipantInfo(this.externalId, this.name, this.hashRoom, this.message);
+
+  factory ParticipantInfo.fromJson(Map<String, dynamic> json) {
+    return ParticipantInfo(
+      json['user_id'] ?? json['client_id'],
+      json['name'],
+      json['hash_room'],
+      json['message'],
+    );
+  }
+}
+
+class ParticipantResponse {
+  final int externalId;
+  final String name;
+  final String hashRoom;
+  final String? message;
+
+  ParticipantResponse(this.externalId, this.name, this.hashRoom, this.message);
 }

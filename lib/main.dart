@@ -43,10 +43,10 @@ class MyApp extends StatelessWidget {
                 builder: (context, state) => JoinMeetingView(),
               ),
               GoRoute(
-                path: '/room/:hashRoom/participant',
+                path: '/room/:tokenCall',
                 builder: (context, state) {
-                  String? hashRoom = state.pathParameters['hashRoom'];
-                  return JoinMeetingView(hashRoom: hashRoom);
+                  String? tokenCall = state.pathParameters['tokenCall'];
+                  return JoinMeetingView(tokenCall: tokenCall);
                 },
               ),
               GoRoute(path: '/meeting', builder: (_, __) => const MeetingView())

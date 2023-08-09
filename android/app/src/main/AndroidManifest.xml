@@ -21,6 +21,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="http" android:host="whatsvideo.mi4u.app" />
+                <data android:scheme="http" android:host="dev.whats.mi4u.app" />
                 <data android:scheme="https" />
             </intent-filter>
             <intent-filter>

@@ -7,9 +7,9 @@ import '../view_models/join_meeting_view_model.dart';
 import '../view_models/meeting_view_model.dart';
 
 class JoinMeetingView extends StatelessWidget {
-  JoinMeetingView({super.key, this.hashRoom});
+  JoinMeetingView({super.key, this.tokenCall});
 
-  final String? hashRoom;
+  final String? tokenCall;
   final TextEditingController hashRoomTEC = TextEditingController();
 
   @override
@@ -21,19 +21,7 @@ class JoinMeetingView extends StatelessWidget {
 
     final orientation = MediaQuery.of(context).orientation;
 
-    bool alreadyLoadMeeting = false;
-
-    hashRoomTEC.value = TextEditingValue(text: (hashRoom ?? '').trim());
-
-    if (hashRoom != null && !alreadyLoadMeeting) {
-      handleJoinMeeting(
-        joinMeetingProvider,
-        methodChannelProvider,
-        meetingProvider,
-        context,
-      );
-      alreadyLoadMeeting = true;
-    }
+    hashRoomTEC.value = TextEditingValue(text: (tokenCall ?? '').trim());
 
     return joinMeetingBody(
       joinMeetingProvider,
@@ -56,10 +44,18 @@ class JoinMeetingView extends StatelessWidget {
       Orientation orientation) {
     if (orientation == Orientation.portrait) {
       return joinMeetingBodyPortrait(
-          joinMeetingProvider, methodChannelProvider, meetingProvider, context);
+        joinMeetingProvider,
+        methodChannelProvider,
+        meetingProvider,
+        context,
+      );
     } else {
       return joinMeetingBodyLandscape(
-          joinMeetingProvider, methodChannelProvider, meetingProvider, context);
+        joinMeetingProvider,
+        methodChannelProvider,
+        meetingProvider,
+        context,
+      );
     }
   }
 
@@ -189,20 +185,21 @@ class JoinMeetingView extends StatelessWidget {
     MeetingViewModel meetingProvider,
     BuildContext context,
   ) async {
-    String hashRoomToConnect = hashRoom ?? hashRoomTEC.text;
+    String hashRoomToConnect = tokenCall ?? hashRoomTEC.text;
 
     if (joinMeetingProvider.verifyParameters(hashRoomToConnect)) {
       joinMeetingProvider.joinButtonClicked = true;
-
-      methodChannelProvider.initializeObservers(meetingProvider);
-      methodChannelProvider.initializeMethodCallHandler();
 
       bool isMeetingJoined = await joinMeetingProvider.joinMeeting(
         meetingProvider,
         methodChannelProvider,
         hashRoomToConnect,
       );
+
       if (isMeetingJoined) {
+        methodChannelProvider.initializeObservers(meetingProvider);
+        methodChannelProvider.initializeMethodCallHandler();
+
         final lastDeviceAudio = meetingProvider.deviceList.last;
 
         if (lastDeviceAudio != null) {

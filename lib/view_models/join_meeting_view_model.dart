@@ -55,7 +55,7 @@ class JoinMeetingViewModel extends ChangeNotifier {
     }
 
     // Make call to api and recieve info in ApiResponse format
-    final ApiResponse? apiResponse = await api.join(hashRoom);
+    final JoinResponse? apiResponse = await api.join(hashRoom);
 
     // Check if ApiResponse is not null or returns a false response value indicating failed api call
     if (apiResponse == null) {
