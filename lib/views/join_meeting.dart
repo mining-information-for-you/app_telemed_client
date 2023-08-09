@@ -283,10 +283,14 @@ class JoinMeetingView extends StatelessWidget {
         scrollDirection: Axis.vertical,
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.all(15),
+            padding: const EdgeInsets.symmetric(vertical: 26, horizontal: 56),
             child: Text(
               "${joinMeetingProvider.errorMessage}",
-              style: const TextStyle(color: Colors.red),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Color.fromARGB(255, 245, 97, 97),
+                fontSize: 16,
+              ),
             ),
           ),
         ),

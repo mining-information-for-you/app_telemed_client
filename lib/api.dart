@@ -3,20 +3,17 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mvp_chime_flutter/api_config.dart';
 
-import 'logger.dart';
-
 class Api {
   final String _baseUrl = ApiConfig.apiUrl;
 
   Future<JoinResponse?> join(String tokenCall) async {
     final responseParticipant = await getParticipantByTokenCall(tokenCall);
     if (responseParticipant == null) {
-      return JoinResponse(response: false, error: 'not.get.participant');
+      return JoinResponse(
+        response: false,
+        error: 'Erro ao obter dados do usuário, solicite um novo código',
+      );
     }
-
-    logger.d('DATA HASH_ROOM ${responseParticipant.hashRoom}');
-    logger.d('DATA NAME ${responseParticipant.name}');
-    logger.d('DATA EXTERNAL_ID ${responseParticipant.externalId}');
 
     String url = "$_baseUrl/chime";
 
@@ -24,8 +21,7 @@ class Api {
       final http.Response response = await http.post(
         Uri.parse(url),
         body: jsonEncode({
-          // 'externalUserId': responseParticipant.externalId.toString(),
-          'externalUserId': 3,
+          'externalUserId': responseParticipant.externalId.toString(),
           'requestId': responseParticipant.hashRoom,
           'nameAttendee': responseParticipant.name
         }),
@@ -34,18 +30,12 @@ class Api {
         },
       );
 
-      final object = json.decode(response.body);
-      final prettyString = const JsonEncoder.withIndent('  ').convert(object);
-      logger.d('DATA: $prettyString');
-
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        logger.i("POST - join api call successful!");
         Map<String, dynamic> joinInfoMap = jsonDecode(response.body);
         JoinInfo joinInfo = JoinInfo.fromJson(joinInfoMap);
         return JoinResponse(response: true, content: joinInfo);
       }
     } catch (e) {
-      logger.e("join request Failed. Status: ${e.toString()}");
       return JoinResponse(response: false, error: e.toString());
     }
     return null;
@@ -69,7 +59,8 @@ class Api {
   }
 
   Future<ParticipantResponse?> getParticipantByTokenCall(
-      String tokenCall) async {
+    String tokenCall,
+  ) async {
     String url = "$_baseUrl/panel/participant/$tokenCall";
 
     try {
@@ -80,16 +71,25 @@ class Api {
         },
       );
 
-      final object = json.decode(response.body);
-      final prettyString = const JsonEncoder.withIndent('  ').convert(object);
-      logger.d('DATA: $prettyString');
-
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        logger.i("GET - get participant data is success!");
-
         Map<String, dynamic> participantMap = jsonDecode(response.body);
         ParticipantInfo participantInfo =
             ParticipantInfo.fromJson(participantMap);
+
+        final roomAvailable = await getRoomAvailable(participantInfo.hashRoom);
+
+        if (roomAvailable == null || roomAvailable.active == false) return null;
+
+        final participantAvailable = await getParticipantAvailable(
+          participantInfo.hashRoom,
+          participantInfo.userId,
+          participantInfo.clientId,
+          participantInfo.customerServiceId,
+          participantInfo.name,
+        );
+
+        if (participantAvailable == null ||
+            participantAvailable.available == false) return null;
 
         return ParticipantResponse(
           participantInfo.externalId,
@@ -99,7 +99,73 @@ class Api {
         );
       }
     } catch (e) {
-      logger.e("join request Failed. Status: ${e.toString()}");
+      return null;
+    }
+    return null;
+  }
+
+  Future<RoomAvailableResponse?> getRoomAvailable(
+    String hashRoom,
+  ) async {
+    String url = "$_baseUrl/panel/room/available";
+
+    try {
+      final http.Response response = await http.post(
+        Uri.parse(url),
+        body: jsonEncode({
+          'hash': hashRoom,
+        }),
+        headers: {
+          "Content-type": "application/json",
+        },
+      );
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        Map<String, dynamic> roomAvailableMap = jsonDecode(response.body);
+        RoomAvailableInfo roomAvailableInfo =
+            RoomAvailableInfo.fromJson(roomAvailableMap);
+
+        return RoomAvailableResponse(roomAvailableInfo.active);
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
+  }
+
+  Future<ParticipantAvailableResponse?> getParticipantAvailable(
+    String hashRoom,
+    int userId,
+    int clientId,
+    int customerServiceId,
+    String name,
+  ) async {
+    String url = "$_baseUrl/panel/participant/available";
+
+    try {
+      final http.Response response = await http.post(
+        Uri.parse(url),
+        body: jsonEncode({
+          'hash': hashRoom,
+          'customer_service_id': customerServiceId,
+          'user_id': userId,
+          'client_id': clientId,
+          'name': name,
+        }),
+        headers: {
+          "Content-type": "application/json",
+        },
+      );
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        Map<String, dynamic> participantAvailableMap =
+            jsonDecode(response.body);
+        ParticipantAvailableInfo participantAvailableInfo =
+            ParticipantAvailableInfo.fromJson(participantAvailableMap);
+
+        return ParticipantAvailableResponse(participantAvailableInfo.available);
+      }
+    } catch (e) {
       return null;
     }
     return null;
@@ -186,15 +252,29 @@ class JoinResponse {
 
 class ParticipantInfo {
   final int externalId;
+  final int clientId;
+  final int userId;
+  final int customerServiceId;
   final String name;
   final String hashRoom;
   final String? message;
 
-  ParticipantInfo(this.externalId, this.name, this.hashRoom, this.message);
+  ParticipantInfo(
+    this.externalId,
+    this.clientId,
+    this.userId,
+    this.customerServiceId,
+    this.name,
+    this.hashRoom,
+    this.message,
+  );
 
   factory ParticipantInfo.fromJson(Map<String, dynamic> json) {
     return ParticipantInfo(
       json['user_id'] ?? json['client_id'],
+      json['client_id'],
+      json['user_id'],
+      json['customer_service_id'],
       json['name'],
       json['hash_room'],
       json['message'],
@@ -209,4 +289,36 @@ class ParticipantResponse {
   final String? message;
 
   ParticipantResponse(this.externalId, this.name, this.hashRoom, this.message);
+}
+
+class RoomAvailableInfo {
+  final bool active;
+
+  RoomAvailableInfo(this.active);
+
+  factory RoomAvailableInfo.fromJson(Map<String, dynamic> json) {
+    return RoomAvailableInfo(json['active']);
+  }
+}
+
+class RoomAvailableResponse {
+  final bool active;
+
+  RoomAvailableResponse(this.active);
+}
+
+class ParticipantAvailableInfo {
+  final bool available;
+
+  ParticipantAvailableInfo(this.available);
+
+  factory ParticipantAvailableInfo.fromJson(Map<String, dynamic> json) {
+    return ParticipantAvailableInfo(json['available']);
+  }
+}
+
+class ParticipantAvailableResponse {
+  final bool available;
+
+  ParticipantAvailableResponse(this.available);
 }
