@@ -26,19 +26,6 @@ class _MeetingViewState extends State<MeetingView> {
   Widget build(BuildContext context) {
     final meetingProvider = Provider.of<MeetingViewModel>(context);
     final orientation = MediaQuery.of(context).orientation;
-
-    if (!meetingProvider.isMeetingActive) {
-      Navigator.maybePop(context);
-    }
-
-    return Scaffold(
-      body: meetingBodyPortrait(meetingProvider, orientation, context),
-    );
-  }
-
-  //
-  Widget meetingBodyPortrait(MeetingViewModel meetingProvider,
-      Orientation orientation, BuildContext context) {
     final size = MediaQuery.of(context).size;
 
     displayVideoTiles(
@@ -47,32 +34,44 @@ class _MeetingViewState extends State<MeetingView> {
       context,
     );
 
-    return Stack(
-      alignment: Alignment.bottomCenter,
-      children: [
-        WillPopScope(
-          onWillPop: () async {
-            meetingProvider.stopMeeting();
-            return true;
-          },
-          child: const SizedBox(height: 0),
+    if (!meetingProvider.isMeetingActive) {
+      Navigator.maybePop(context);
+    }
+
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Padding(
+        padding: const EdgeInsets.only(top: 32),
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            WillPopScope(
+              onWillPop: () async {
+                meetingProvider.stopMeeting();
+                return true;
+              },
+              child: const SizedBox(height: 0),
+            ),
+            SizedBox(
+              height: size.height,
+              width: size.width,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: listVideoTiles,
+              ),
+            ),
+            displayAttendeeLocal(meetingProvider, context),
+          ],
         ),
-        SizedBox(
-          height: size.height,
-          width: size.width,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: listVideoTiles,
-          ),
-        ),
-        displayAttendeeLocal(meetingProvider, context),
-      ],
+      ),
     );
   }
 
   Widget displayAttendeeLocal(
-      MeetingViewModel meetingProvider, BuildContext context) {
+    MeetingViewModel meetingProvider,
+    BuildContext context,
+  ) {
     Widget attendeeLocal = const SizedBox(height: 0);
     if (meetingProvider.currAttendees
         .containsKey(meetingProvider.localAttendeeId)) {
@@ -223,8 +222,11 @@ class _MeetingViewState extends State<MeetingView> {
     );
   }
 
-  void displayVideoTiles(MeetingViewModel meetingProvider,
-      Orientation orientation, BuildContext context) {
+  void displayVideoTiles(
+    MeetingViewModel meetingProvider,
+    Orientation orientation,
+    BuildContext context,
+  ) {
     Widget screenShareWidget = Container(
       child: videoTile(
         meetingProvider,
@@ -233,27 +235,17 @@ class _MeetingViewState extends State<MeetingView> {
         isContent: true,
       ),
     );
-    Widget localVideoTile = Expanded(
-      child: FittedBox(
-        fit: BoxFit.cover,
-        child: videoTile(
-          meetingProvider,
-          context,
-          isLocal: true,
-          isContent: false,
-        ),
-      ),
+    Widget localVideoTile = videoTile(
+      meetingProvider,
+      context,
+      isLocal: true,
+      isContent: false,
     );
-    Widget remoteVideoTile = Expanded(
-      child: FittedBox(
-        fit: BoxFit.cover,
-        child: videoTile(
-          meetingProvider,
-          context,
-          isLocal: false,
-          isContent: false,
-        ),
-      ),
+    Widget remoteVideoTile = videoTile(
+      meetingProvider,
+      context,
+      isLocal: false,
+      isContent: false,
     );
 
     if (meetingProvider.currAttendees
@@ -267,40 +259,32 @@ class _MeetingViewState extends State<MeetingView> {
     }
 
     List<Widget> videoTiles = [];
-    List<String> videoTilesAttendeeId = [];
 
-    final onAddRemoteVideoTile = (meetingProvider.remoteAttendeeId) != null &&
-        (meetingProvider.currAttendees
-            .containsKey(meetingProvider.remoteAttendeeId)) &&
-        (meetingProvider
-                .currAttendees[meetingProvider.remoteAttendeeId]?.isVideoOn ??
-            false) &&
-        (meetingProvider
-                .currAttendees[meetingProvider.remoteAttendeeId]?.videoTile !=
-            null) &&
-        (!videoTilesAttendeeId
-            .any((id) => id.contains(meetingProvider.remoteAttendeeId!)));
-
-    final onAddLocalVideoTile = (meetingProvider
-                .currAttendees[meetingProvider.localAttendeeId]?.isVideoOn ??
-            false) &&
-        (meetingProvider
-                .currAttendees[meetingProvider.localAttendeeId]?.videoTile !=
-            null) &&
-        (!videoTilesAttendeeId
-            .any((id) => id.contains(meetingProvider.localAttendeeId!)));
-
-    if (onAddRemoteVideoTile) {
-      videoTilesAttendeeId.add(meetingProvider.remoteAttendeeId!);
-      videoTiles.add(remoteVideoTile);
+    if (meetingProvider
+            .currAttendees[meetingProvider.localAttendeeId]?.isVideoOn ??
+        false) {
+      if (meetingProvider
+              .currAttendees[meetingProvider.localAttendeeId]?.videoTile !=
+          null) {
+        videoTiles.add(localVideoTile);
+      }
     }
 
-    if (onAddLocalVideoTile) {
-      videoTilesAttendeeId.add(meetingProvider.localAttendeeId!);
-      videoTiles.add(localVideoTile);
+    if (meetingProvider.currAttendees.length > 1) {
+      if (meetingProvider.currAttendees
+          .containsKey(meetingProvider.remoteAttendeeId)) {
+        if ((meetingProvider.currAttendees[meetingProvider.remoteAttendeeId]
+                    ?.isVideoOn ??
+                false) &&
+            meetingProvider.currAttendees[meetingProvider.remoteAttendeeId]
+                    ?.videoTile !=
+                null) {
+          videoTiles.add(Expanded(child: remoteVideoTile));
+        }
+      }
     }
 
-    if (videoTiles.isEmpty) {
+    if (listVideoTiles.isEmpty) {
       Widget emptyVideos = Column(
         children: [
           const Text(
@@ -317,16 +301,18 @@ class _MeetingViewState extends State<MeetingView> {
         ],
       );
       if (orientation == Orientation.portrait) {
-        videoTiles.add(
-          emptyVideos,
-        );
+        setState(() {
+          listVideoTiles = [emptyVideos];
+        });
       } else {
-        videoTiles.add(
-          Center(
-            widthFactor: 2.5,
-            child: emptyVideos,
-          ),
-        );
+        setState(() {
+          listVideoTiles = [
+            Center(
+              widthFactor: 2.5,
+              child: emptyVideos,
+            ),
+          ];
+        });
       }
     }
 
@@ -393,8 +379,12 @@ class _MeetingViewState extends State<MeetingView> {
     );
   }
 
-  Widget videoTile(MeetingViewModel meetingProvider, BuildContext context,
-      {required bool isLocal, required bool isContent}) {
+  Widget videoTile(
+    MeetingViewModel meetingProvider,
+    BuildContext context, {
+    required bool isLocal,
+    required bool isContent,
+  }) {
     int? paramsVT;
 
     if (isContent) {
