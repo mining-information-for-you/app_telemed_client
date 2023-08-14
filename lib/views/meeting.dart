@@ -21,6 +21,7 @@ class MeetingView extends StatefulWidget {
 
 class _MeetingViewState extends State<MeetingView> {
   List<Widget> listVideoTiles = [];
+  Widget? localVideoTile;
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +63,7 @@ class _MeetingViewState extends State<MeetingView> {
               ),
             ),
             displayAttendeeLocal(meetingProvider, context),
+            localVideoTile ?? const SizedBox(height: 0),
           ],
         ),
       ),
@@ -235,11 +237,19 @@ class _MeetingViewState extends State<MeetingView> {
         isContent: true,
       ),
     );
-    Widget localVideoTile = videoTile(
-      meetingProvider,
-      context,
-      isLocal: true,
-      isContent: false,
+    Widget localVideoTileWidget = Positioned(
+      right: 10,
+      bottom: 80,
+      child: SizedBox(
+        height: 180,
+        width: 130,
+        child: videoTile(
+          meetingProvider,
+          context,
+          isLocal: true,
+          isContent: false,
+        ),
+      ),
     );
     Widget remoteVideoTile = videoTile(
       meetingProvider,
@@ -266,7 +276,9 @@ class _MeetingViewState extends State<MeetingView> {
       if (meetingProvider
               .currAttendees[meetingProvider.localAttendeeId]?.videoTile !=
           null) {
-        videoTiles.add(localVideoTile);
+        setState(() {
+          localVideoTile = localVideoTileWidget;
+        });
       }
     }
 
@@ -284,41 +296,37 @@ class _MeetingViewState extends State<MeetingView> {
       }
     }
 
-    if (listVideoTiles.isEmpty) {
-      Widget emptyVideos = Column(
-        children: [
-          const Text(
-            "Sem vídeo aberto",
-            style: TextStyle(
-              fontSize: 24,
-            ),
+    if (videoTiles.isEmpty) {
+      Widget emptyVideos = Expanded(
+        child: Container(
+          color: Colors.white,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                "Sem vídeo remoto aberto",
+                style: TextStyle(
+                  fontSize: 24,
+                ),
+              ),
+              Icon(
+                Icons.videocam_off,
+                size: 94,
+                color: Colors.grey.withAlpha(500),
+              )
+            ],
           ),
-          Icon(
-            Icons.videocam_off,
-            size: 94,
-            color: Colors.grey.withAlpha(500),
-          )
-        ],
+        ),
       );
-      if (orientation == Orientation.portrait) {
-        setState(() {
-          listVideoTiles = [emptyVideos];
-        });
-      } else {
-        setState(() {
-          listVideoTiles = [
-            Center(
-              widthFactor: 2.5,
-              child: emptyVideos,
-            ),
-          ];
-        });
-      }
+      setState(() {
+        listVideoTiles = [emptyVideos];
+      });
+    } else {
+      setState(() {
+        listVideoTiles = videoTiles;
+      });
     }
-
-    setState(() {
-      listVideoTiles = videoTiles;
-    });
   }
 
   Widget contentVideoTile(
