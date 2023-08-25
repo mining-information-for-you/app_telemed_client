@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
                   return JoinMeetingView(tokenCall: tokenCall);
                 },
               ),
-              GoRoute(path: '/meeting', builder: (_, __) => const MeetingView())
+              GoRoute(path: '/meeting', builder: (_, __) => MeetingView())
             ],
           ),
         ),

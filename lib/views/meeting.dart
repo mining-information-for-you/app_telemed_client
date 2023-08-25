@@ -6,22 +6,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mvp_chime_flutter/video_tile.dart';
 import 'package:mvp_chime_flutter/view_models/meeting_view_model.dart';
 import 'package:mvp_chime_flutter/views/screenshare.dart';
 import 'package:provider/provider.dart';
 
 import '../logger.dart';
 
-class MeetingView extends StatefulWidget {
-  const MeetingView({Key? key}) : super(key: key);
+// ignore: must_be_immutable
+class MeetingView extends StatelessWidget {
+  MeetingView({Key? key}) : super(key: key);
 
-  @override
-  State<MeetingView> createState() => _MeetingViewState();
-}
+  List<Widget>? listVideoTiles;
 
-class _MeetingViewState extends State<MeetingView> {
-  List<Widget> listVideoTiles = [];
   Widget? localVideoTile;
 
   @override
@@ -60,15 +56,13 @@ class _MeetingViewState extends State<MeetingView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: listVideoTiles,
+                children: [
+                  ...listVideoTiles ?? [],
+                  localVideoTile ?? const SizedBox(height: 0)
+                ],
               ),
             ),
             displayActionsAttendeeLocal(meetingProvider, context),
-            Positioned(
-              right: 10,
-              bottom: 80,
-              child: localVideoTile ?? const SizedBox(height: 0),
-            ),
           ],
         ),
       ),
@@ -93,7 +87,7 @@ class _MeetingViewState extends State<MeetingView> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withAlpha(175),
+        color: Colors.white.withAlpha(145),
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
@@ -198,8 +192,8 @@ class _MeetingViewState extends State<MeetingView> {
     }
 
     if (!meetingProvider.isReceivingScreenShare) {
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => const MeetingView()));
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => MeetingView()));
     }
 
     Navigator.pushReplacement(
@@ -216,7 +210,7 @@ class _MeetingViewState extends State<MeetingView> {
                         onDoubleTap: () => Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const MeetingView())),
+                                builder: (context) => MeetingView())),
                         child: contentTile),
                   ),
                 ),
@@ -234,60 +228,48 @@ class _MeetingViewState extends State<MeetingView> {
     Orientation orientation,
     BuildContext context,
   ) {
-    Widget screenShareWidget = Container(
-      child: videoTile(
-        meetingProvider,
-        context,
-        isLocal: false,
-        isContent: true,
-      ),
-    );
-
     if (meetingProvider
             .currAttendees[meetingProvider.localAttendeeId]?.isVideoOn ??
         false) {
       if (meetingProvider
               .currAttendees[meetingProvider.localAttendeeId]?.videoTile !=
           null) {
-        setState(() {
-          localVideoTile = Container(
-            key: Key(meetingProvider.localAttendeeId.toString()),
-            height: 180,
-            width: 130,
-            decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.25),
-                  spreadRadius: 2,
-                  blurRadius: 6,
-                ),
-              ],
-            ),
-            child: videoTile(
-              meetingProvider,
-              context,
-              isLocal: true,
-              isContent: false,
-            ),
-          );
-        });
+        localVideoTile = videoTile(
+          meetingProvider,
+          context,
+          isContent: false,
+          videoTileId: meetingProvider
+              .currAttendees[meetingProvider.localAttendeeId]!
+              .videoTile!
+              .tileId,
+        );
       } else {
-        setState(() {
-          localVideoTile = null;
-        });
+        localVideoTile = null;
       }
     } else {
-      setState(() {
-        localVideoTile = null;
-      });
+      localVideoTile = null;
     }
 
     if (meetingProvider.currAttendees
         .containsKey(meetingProvider.contentAttendeeId)) {
       if (meetingProvider.isReceivingScreenShare) {
-        setState(() {
-          listVideoTiles = [screenShareWidget];
-        });
+        if (meetingProvider.contentAttendeeId != null) {
+          if (meetingProvider.currAttendees[meetingProvider.contentAttendeeId]
+                  ?.videoTile !=
+              null) {
+            listVideoTiles = [
+              videoTile(
+                meetingProvider,
+                context,
+                isContent: true,
+                videoTileId: meetingProvider
+                    .currAttendees[meetingProvider.contentAttendeeId]
+                    ?.videoTile
+                    ?.tileId as int,
+              )
+            ];
+          }
+        }
         return;
       }
     }
@@ -306,9 +288,8 @@ class _MeetingViewState extends State<MeetingView> {
                     child: videoTile(
                       meetingProvider,
                       context,
-                      isLocal: false,
                       isContent: false,
-                      videoTileRemote: attendee.videoTile,
+                      videoTileId: attendee.videoTile!.tileId,
                     ),
                   ),
                 );
@@ -342,13 +323,9 @@ class _MeetingViewState extends State<MeetingView> {
           ),
         ),
       );
-      setState(() {
-        listVideoTiles = [emptyVideos];
-      });
+      listVideoTiles = [emptyVideos];
     } else {
-      setState(() {
-        listVideoTiles = videoTiles;
-      });
+      listVideoTiles = videoTiles;
     }
   }
 
@@ -413,9 +390,8 @@ class _MeetingViewState extends State<MeetingView> {
   Widget videoTile(
     MeetingViewModel meetingProvider,
     BuildContext context, {
-    required bool isLocal,
     required bool isContent,
-    VideoTile? videoTileRemote,
+    required int videoTileId,
   }) {
     int? paramsVT;
 
@@ -431,11 +407,8 @@ class _MeetingViewState extends State<MeetingView> {
           return contentVideoTile(paramsVT, meetingProvider, context);
         }
       }
-    } else if (isLocal) {
-      paramsVT = meetingProvider
-          .currAttendees[meetingProvider.localAttendeeId]?.videoTile?.tileId;
-    } else if (videoTileRemote != null) {
-      paramsVT = videoTileRemote.tileId;
+    } else {
+      paramsVT = videoTileId;
     }
 
     Widget videoTile;
