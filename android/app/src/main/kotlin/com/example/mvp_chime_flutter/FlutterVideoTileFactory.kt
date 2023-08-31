@@ -1,4 +1,4 @@
-package com.example.mvp_chime_flutter
+package com.example.telemed_neurondata
 
 import android.content.Context
 import io.flutter.plugin.common.StandardMessageCodec

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mvp_chime_flutter/interface/audio_devices_interface.dart';
-import 'package:mvp_chime_flutter/interface/audio_video_interface.dart';
-import 'package:mvp_chime_flutter/interface/realtime_interface.dart';
-import 'package:mvp_chime_flutter/interface/video_tile_interface.dart';
-import 'package:mvp_chime_flutter/response_enums.dart';
+import 'package:telemed_neurondata/interface/audio_devices_interface.dart';
+import 'package:telemed_neurondata/interface/audio_video_interface.dart';
+import 'package:telemed_neurondata/interface/realtime_interface.dart';
+import 'package:telemed_neurondata/interface/video_tile_interface.dart';
+import 'package:telemed_neurondata/response_enums.dart';
 import 'package:provider/provider.dart';
 
 import '../api.dart';

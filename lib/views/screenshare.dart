@@ -5,7 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:mvp_chime_flutter/view_models/meeting_view_model.dart';
+import 'package:telemed_neurondata/view_models/meeting_view_model.dart';
 import 'package:provider/provider.dart';
 
 class ScreenShare extends StatelessWidget {

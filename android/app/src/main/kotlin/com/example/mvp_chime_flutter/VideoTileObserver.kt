@@ -1,4 +1,4 @@
-package com.example.mvp_chime_flutter
+package com.example.telemed_neurondata
 
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.VideoTileObserver
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.video.VideoTileState

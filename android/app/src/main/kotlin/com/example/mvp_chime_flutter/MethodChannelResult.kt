@@ -1,4 +1,4 @@
-package com.example.mvp_chime_flutter
+package com.example.telemed_neurondata
 
 class MethodChannelResult(val result: Boolean, val arguments: Any?) {
 

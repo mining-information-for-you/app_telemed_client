@@ -1,4 +1,4 @@
-package com.example.mvp_chime_flutter
+package com.example.telemed_neurondata
 
 enum class MethodCall(val call: String) {
     manageAudioPermissions("manageAudioPermissions"),

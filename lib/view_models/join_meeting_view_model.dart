@@ -1,7 +1,7 @@
 import 'dart:io' show InternetAddress, SocketException;
 
 import 'package:flutter/material.dart';
-import 'package:mvp_chime_flutter/api.dart';
+import 'package:telemed_neurondata/api.dart';
 
 import '../logger.dart';
 import '../method_channel_coordinator.dart';

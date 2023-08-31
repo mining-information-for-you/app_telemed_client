@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="mvp_chime_flutter"
+        android:label="Telemed NeuronData"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

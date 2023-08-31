@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mvp_chime_flutter/view_models/meeting_view_model.dart';
-import 'package:mvp_chime_flutter/views/screenshare.dart';
+import 'package:telemed_neurondata/view_models/meeting_view_model.dart';
+import 'package:telemed_neurondata/views/screenshare.dart';
 import 'package:provider/provider.dart';
 
 import '../logger.dart';

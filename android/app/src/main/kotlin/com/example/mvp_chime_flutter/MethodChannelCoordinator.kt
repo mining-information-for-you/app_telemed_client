@@ -1,4 +1,4 @@
-package com.example.mvp_chime_flutter
+package com.example.telemed_neurondata
 
 import com.amazonaws.services.chime.sdk.meetings.device.MediaDevice
 import com.amazonaws.services.chime.sdk.meetings.session.DefaultMeetingSession
@@ -9,7 +9,7 @@ import com.amazonaws.services.chime.sdk.meetings.session.Meeting
 import com.amazonaws.services.chime.sdk.meetings.session.CreateAttendeeResponse
 import com.amazonaws.services.chime.sdk.meetings.session.Attendee
 import com.amazonaws.services.chime.sdk.meetings.utils.logger.ConsoleLogger
-import com.example.mvp_chime_flutter.MethodCall as MethodCallFlutter
+import com.example.telemed_neurondata.MethodCall as MethodCallFlutter
 import android.app.Activity
 import android.content.Context
 import io.flutter.plugin.common.BinaryMessenger
@@ -25,7 +25,7 @@ class MethodChannelCoordinator(binaryMessenger: BinaryMessenger, activity: Activ
 
     init {
         methodChannel =
-            MethodChannel(binaryMessenger, "com.example.mvp_chime_flutter.methodChannel")
+            MethodChannel(binaryMessenger, "com.example.telemed_neurondata.methodChannel")
         context = activity.applicationContext
     }
 

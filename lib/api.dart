@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:mvp_chime_flutter/api_config.dart';
+import 'package:telemed_neurondata/api_config.dart';
 
 class Api {
   final String _baseUrl = ApiConfig.apiUrl;

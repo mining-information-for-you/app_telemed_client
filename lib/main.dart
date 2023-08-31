@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mvp_chime_flutter/view_models/join_meeting_view_model.dart';
-import 'package:mvp_chime_flutter/view_models/meeting_view_model.dart';
-import 'package:mvp_chime_flutter/views/join_meeting.dart';
-import 'package:mvp_chime_flutter/views/meeting.dart';
+import 'package:telemed_neurondata/view_models/join_meeting_view_model.dart';
+import 'package:telemed_neurondata/view_models/meeting_view_model.dart';
+import 'package:telemed_neurondata/views/join_meeting.dart';
+import 'package:telemed_neurondata/views/meeting.dart';
 import 'package:provider/provider.dart';
 
 import 'method_channel_coordinator.dart';

@@ -1,4 +1,4 @@
-import 'package:mvp_chime_flutter/video_tile.dart';
+import 'package:telemed_neurondata/video_tile.dart';
 
 class Attendee {
   final String attendeeId;

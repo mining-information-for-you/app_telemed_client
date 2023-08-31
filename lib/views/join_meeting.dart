@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mvp_chime_flutter/method_channel_coordinator.dart';
+import 'package:telemed_neurondata/method_channel_coordinator.dart';
 import 'package:provider/provider.dart';
 
 import '../view_models/join_meeting_view_model.dart';
