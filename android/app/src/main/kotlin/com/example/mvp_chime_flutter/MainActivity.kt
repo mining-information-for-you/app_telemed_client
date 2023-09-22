@@ -1,4 +1,4 @@
-package com.example.telemed_neurondata
+package com.neurondata.telemed_neurondata
 
 import androidx.annotation.NonNull
 import io.flutter.embedding.android.FlutterActivity

@@ -1,4 +1,4 @@
-package com.example.telemed_neurondata
+package com.neurondata.telemed_neurondata
 
 import android.content.Context
 import android.view.View
