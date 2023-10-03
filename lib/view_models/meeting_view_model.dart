@@ -29,6 +29,7 @@ class MeetingViewModel extends ChangeNotifier
   String? contentAttendeeId;
 
   String? selectedAudioDevice;
+  bool? changedSelectedAudioDevice;
   List<String?> deviceList = [];
 
   // AttendeeId is the key
@@ -316,6 +317,27 @@ class MeetingViewModel extends ChangeNotifier
       } else {
         logger.e(switchCamera.arguments);
       }
+    }
+  }
+
+  void toggleLocalOutputAudio() async {
+    if (!currAttendees.containsKey(localAttendeeId)) {
+      logger.e("Local attendee not found");
+      return;
+    }
+
+    final lastDeviceAudio = deviceList.last;
+    final firstDeviceAudio = deviceList.first;
+
+    final existLastDeviceAudio = lastDeviceAudio != null;
+    final existFirstDeviceAudio = firstDeviceAudio != null;
+
+    if (selectedAudioDevice == lastDeviceAudio && existFirstDeviceAudio) {
+      updateCurrentDevice(firstDeviceAudio);
+      changedSelectedAudioDevice = false;
+    } else if (existLastDeviceAudio) {
+      updateCurrentDevice(lastDeviceAudio);
+      changedSelectedAudioDevice = true;
     }
   }
 

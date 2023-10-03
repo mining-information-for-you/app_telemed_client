@@ -125,6 +125,18 @@ class MeetingView extends StatelessWidget {
             width: 16,
           ),
           IconButton(
+            icon: Icon(audioOutputIcon(meetingProvider)),
+            iconSize: 28,
+            constraints: const BoxConstraints(),
+            color: Colors.blue,
+            onPressed: () {
+              meetingProvider.toggleLocalOutputAudio();
+            },
+          ),
+          const SizedBox(
+            width: 16,
+          ),
+          IconButton(
             icon: Icon(localVideoIcon(meetingProvider)),
             iconSize: 28,
             constraints: const BoxConstraints(),
@@ -500,6 +512,15 @@ class MeetingView extends StatelessWidget {
       return Icons.videocam;
     } else {
       return Icons.videocam_off;
+    }
+  }
+
+  IconData audioOutputIcon(MeetingViewModel meetingProvider) {
+    final changedAudio = meetingProvider.changedSelectedAudioDevice == true;
+    if (changedAudio) {
+      return Icons.spatial_audio_off;
+    } else {
+      return Icons.volume_up;
     }
   }
 }

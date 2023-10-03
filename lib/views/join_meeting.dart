@@ -200,11 +200,7 @@ class JoinMeetingView extends StatelessWidget {
         methodChannelProvider.initializeObservers(meetingProvider);
         methodChannelProvider.initializeMethodCallHandler();
 
-        final lastDeviceAudio = meetingProvider.deviceList.last;
-
-        if (lastDeviceAudio != null) {
-          meetingProvider.updateCurrentDevice(lastDeviceAudio);
-        }
+        meetingProvider.toggleLocalOutputAudio();
 
         // ignore: use_build_context_synchronously
         context.go('/meeting');
