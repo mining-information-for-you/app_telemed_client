@@ -66,7 +66,7 @@ Segue o arquivo configurado deste aplicativo:
 
 4. Defina o `sha256_cert_fingerprints` com o valor disponível na página ao finalizar o passo 1.
 
-5. Hospede o arquivo no site que está acesso ao `deep link`, criando o caminho: <root>/.well-known/assetlinks.json
+5. Hospede o arquivo no site que está acesso ao `deep link`, criando o caminho: <publicFolder>/.well-known/assetlinks.json
 
 6. Verifique se consegue ter o acesso
 
