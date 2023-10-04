@@ -271,7 +271,7 @@ class ParticipantInfo {
 
   factory ParticipantInfo.fromJson(Map<String, dynamic> json) {
     return ParticipantInfo(
-      json['user_id'] ?? json['client_id'],
+      json['id'],
       json['client_id'],
       json['user_id'],
       json['customer_service_id'],
