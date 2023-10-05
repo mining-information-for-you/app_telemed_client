@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:telemed_neurondata/view_models/meeting_view_model.dart';
 import 'package:telemed_neurondata/views/screenshare.dart';
 import 'package:provider/provider.dart';
+import 'package:telemed_neurondata/views/thanks.dart';
 
 import '../logger.dart';
 
@@ -27,7 +28,8 @@ class MeetingView extends StatelessWidget {
     final size = MediaQuery.of(context).size;
 
     if (!meetingProvider.isMeetingActive) {
-      Navigator.maybePop(context);
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => const ThanksView()));
     }
 
     displayVideoTiles(
@@ -107,7 +109,7 @@ class MeetingView extends StatelessWidget {
             color: Colors.red,
             onPressed: () {
               meetingProvider.stopMeeting();
-              context.replace('/');
+              context.replace('/thanks');
             },
           ),
           const SizedBox(

@@ -45,7 +45,8 @@ class MyApp extends StatelessWidget {
               ),
               GoRoute(
                 path: '/thanks',
-                builder: (context, state) => const ThanksView(),
+                // ignore: prefer_const_constructors
+                builder: (context, state) => ThanksView(),
               ),
               GoRoute(
                 path: '/room/:tokenCall',
