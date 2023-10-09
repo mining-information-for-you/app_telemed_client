@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:telemed_neurondata/method_channel_coordinator.dart';
 import 'package:provider/provider.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import '../view_models/join_meeting_view_model.dart';
 import '../view_models/meeting_view_model.dart';
@@ -19,6 +20,12 @@ class JoinMeetingView extends StatelessWidget {
         Provider.of<MethodChannelCoordinator>(context);
     final meetingProvider = Provider.of<MeetingViewModel>(context);
     final size = MediaQuery.of(context).size;
+
+    final maskFormatter = MaskTextInputFormatter(
+      mask: '###-###',
+      filter: {"#": RegExp(r'[0-9a-zA-Z]')},
+      type: MaskAutoCompletionType.lazy,
+    );
 
     hashRoomTEC.value = TextEditingValue(text: (tokenCall ?? '').trim());
 
@@ -69,6 +76,7 @@ class JoinMeetingView extends StatelessWidget {
                   children: [
                     TextField(
                       controller: hashRoomTEC,
+                      inputFormatters: [maskFormatter],
                       style: const TextStyle(
                         color: Color(0xFF2a2a2a),
                       ),
