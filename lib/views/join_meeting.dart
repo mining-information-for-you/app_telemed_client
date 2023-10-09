@@ -18,164 +18,130 @@ class JoinMeetingView extends StatelessWidget {
     final methodChannelProvider =
         Provider.of<MethodChannelCoordinator>(context);
     final meetingProvider = Provider.of<MeetingViewModel>(context);
-
-    final orientation = MediaQuery.of(context).orientation;
+    final size = MediaQuery.of(context).size;
 
     hashRoomTEC.value = TextEditingValue(text: (tokenCall ?? '').trim());
 
-    return joinMeetingBody(
-      joinMeetingProvider,
-      methodChannelProvider,
-      meetingProvider,
-      context,
-      orientation,
-    );
-  }
-
-//
-// —————————————————————————— Main Body ——————————————————————————————————————
-//
-
-  Widget joinMeetingBody(
-      JoinMeetingViewModel joinMeetingProvider,
-      MethodChannelCoordinator methodChannelProvider,
-      MeetingViewModel meetingProvider,
-      BuildContext context,
-      Orientation orientation) {
-    if (orientation == Orientation.portrait) {
-      return joinMeetingBodyPortrait(
-        joinMeetingProvider,
-        methodChannelProvider,
-        meetingProvider,
-        context,
-      );
-    } else {
-      return joinMeetingBodyLandscape(
-        joinMeetingProvider,
-        methodChannelProvider,
-        meetingProvider,
-        context,
-      );
-    }
-  }
-
-//
-// —————————————————————————— Portrait Body ——————————————————————————————————————
-//
-
-  Widget joinMeetingBodyPortrait(
-      JoinMeetingViewModel joinMeetingProvider,
-      MethodChannelCoordinator methodChannelProvider,
-      MeetingViewModel meetingProvider,
-      BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.blue.withAlpha(500),
-                Colors.greenAccent,
-              ],
+      body: Stack(
+        children: [
+          Container(
+            alignment: Alignment.centerLeft,
+            height: size.height,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFF92ABFB),
+                  Color(0xFF3360F6),
+                ],
+              ),
             ),
+            child: Image.asset('assets/background.png'),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 52, horizontal: 32),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                titleFlutterDemo(5),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 32,
-                    vertical: 10,
+                // Header
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Image.asset('assets/logo.png'),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 14),
+                      child: Text(
+                        "Tele-Consulta",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                // Formulários
+                Column(
+                  children: [
+                    TextField(
+                      controller: hashRoomTEC,
+                      style: const TextStyle(
+                        color: Color(0xFF2a2a2a),
+                      ),
+                      decoration: const InputDecoration(
+                        labelText: "Código da sala",
+                        labelStyle: TextStyle(
+                          color: Colors.grey,
+                        ),
+                        floatingLabelBehavior: FloatingLabelBehavior.never,
+                        floatingLabelStyle: TextStyle(
+                          color: Colors.white,
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(width: 2, color: Colors.white),
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(width: 2, color: Colors.white),
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 24,
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFEBEAFB),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 40,
+                          vertical: 16,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        "Entrar",
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Color(0xFF2a2a2a),
+                        ),
+                      ),
+                      onPressed: () async {
+                        // Hide Keyboard
+                        FocusManager.instance.primaryFocus?.unfocus();
+
+                        handleJoinMeeting(
+                          joinMeetingProvider,
+                          methodChannelProvider,
+                          meetingProvider,
+                          context,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+
+                // Footer
+                const Text(
+                  'www.neurondata.com.br',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
                   ),
-                  child: hashRoomTextField(hashRoomTEC),
                 ),
-                joinButton(
-                  joinMeetingProvider,
-                  methodChannelProvider,
-                  meetingProvider,
-                  context,
-                ),
-                loadingIcon(joinMeetingProvider),
-                errorMessage(joinMeetingProvider),
               ],
             ),
-          ),
-        ),
+          )
+        ],
       ),
-    );
-  }
-
-//
-// —————————————————————————— Landscape Body ——————————————————————————————————————
-//
-
-  Widget joinMeetingBodyLandscape(
-      JoinMeetingViewModel joinMeetingProvider,
-      MethodChannelCoordinator methodChannelProvider,
-      MeetingViewModel meetingProvider,
-      BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(
-                height: 60,
-              ),
-              titleFlutterDemo(10),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 60, vertical: 10),
-                child: hashRoomTextField(hashRoomTEC),
-              ),
-              joinButton(joinMeetingProvider, methodChannelProvider,
-                  meetingProvider, context),
-              loadingIcon(joinMeetingProvider),
-              errorMessage(joinMeetingProvider),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-//
-// —————————————————————————— Helpers ——————————————————————————————————————
-//
-
-  Widget joinButton(
-      JoinMeetingViewModel joinMeetingProvider,
-      MethodChannelCoordinator methodChannelProvider,
-      MeetingViewModel meetingProvider,
-      BuildContext context) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-      child: const Text(
-        "Entrar",
-        style: TextStyle(
-          fontSize: 18,
-        ),
-      ),
-      onPressed: () async {
-        // Hide Keyboard
-        FocusManager.instance.primaryFocus?.unfocus();
-
-        handleJoinMeeting(
-          joinMeetingProvider,
-          methodChannelProvider,
-          meetingProvider,
-          context,
-        );
-      },
     );
   }
 
@@ -207,60 +173,6 @@ class JoinMeetingView extends StatelessWidget {
       }
     }
     joinMeetingProvider.joinButtonClicked = false;
-  }
-
-  Widget titleFlutterDemo(double pad) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: pad),
-      child: const Column(
-        children: [
-          Text(
-            "Tele-consulta",
-            style: TextStyle(
-              fontSize: 40,
-              color: Colors.white,
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(left: 24, right: 24, top: 82),
-            child: Text(
-              "Entre com o código da sala para ter sua consulta",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget hashRoomTextField(hashRoomTEC) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: TextField(
-        controller: hashRoomTEC,
-        style: const TextStyle(
-          color: Colors.white,
-        ),
-        decoration: const InputDecoration(
-          labelText: "Código da sala",
-          labelStyle: TextStyle(
-            color: Colors.white,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(width: 2, color: Colors.white),
-            borderRadius: BorderRadius.all(Radius.circular(12)),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(width: 2, color: Colors.white),
-            borderRadius: BorderRadius.all(Radius.circular(12)),
-          ),
-        ),
-      ),
-    );
   }
 
   Widget loadingIcon(JoinMeetingViewModel joinMeetingProvider) {
