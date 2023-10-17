@@ -115,24 +115,35 @@ class JoinMeetingView extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text(
-                        "Entrar",
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Color(0xFF2a2a2a),
-                        ),
-                      ),
                       onPressed: () async {
                         // Hide Keyboard
                         FocusManager.instance.primaryFocus?.unfocus();
 
-                        handleJoinMeeting(
-                          joinMeetingProvider,
-                          methodChannelProvider,
-                          meetingProvider,
-                          context,
-                        );
+                        if (joinMeetingProvider.loadingStatus == false) {
+                          handleJoinMeeting(
+                            joinMeetingProvider,
+                            methodChannelProvider,
+                            meetingProvider,
+                            context,
+                          );
+                        }
                       },
+                      child: joinMeetingProvider.loadingStatus
+                          ? const SizedBox(
+                              height: 22,
+                              width: 22,
+                              child: CircularProgressIndicator(
+                                color: Color(0xFF2a2a2a),
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text(
+                              "Entrar",
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Color(0xFF2a2a2a),
+                              ),
+                            ),
                     ),
                   ],
                 ),
