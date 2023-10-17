@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:telemed_neurondata/method_channel_coordinator.dart';
 import 'package:provider/provider.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
 import '../view_models/join_meeting_view_model.dart';
 import '../view_models/meeting_view_model.dart';
@@ -189,7 +190,12 @@ class JoinMeetingView extends StatelessWidget {
 
         // ignore: use_build_context_synchronously
         context.go('/meeting');
+      } else {
+        // ignore: use_build_context_synchronously
+        errorMessage(joinMeetingProvider, context);
       }
+    } else {
+      errorMessage(joinMeetingProvider, context);
     }
     joinMeetingProvider.joinButtonClicked = false;
   }
@@ -204,26 +210,28 @@ class JoinMeetingView extends StatelessWidget {
     }
   }
 
-  Widget errorMessage(JoinMeetingViewModel joinMeetingProvider) {
+  void errorMessage(
+      JoinMeetingViewModel joinMeetingProvider, BuildContext context) {
     if (joinMeetingProvider.error) {
-      return SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 26, horizontal: 56),
-            child: Text(
-              "${joinMeetingProvider.errorMessage}",
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Color.fromARGB(255, 245, 97, 97),
-                fontSize: 16,
-              ),
-            ),
-          ),
+      final snackBar = SnackBar(
+        /// need to set following properties for best effect of awesome_snackbar_content
+        elevation: 0,
+        duration: const Duration(seconds: 5),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          title: 'Ops!',
+          message:
+              'Não foi possível conectar, solicite um novo código e tente novamente!',
+
+          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+          contentType: ContentType.failure,
         ),
       );
-    } else {
-      return const SizedBox.shrink();
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
     }
   }
 }
