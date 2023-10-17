@@ -10,6 +10,7 @@ import 'package:telemed_neurondata/view_models/meeting_view_model.dart';
 import 'package:telemed_neurondata/views/screenshare.dart';
 import 'package:provider/provider.dart';
 import 'package:telemed_neurondata/views/thanks.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../logger.dart';
 
@@ -314,29 +315,53 @@ class MeetingView extends StatelessWidget {
       );
     }
 
-    if (videoTiles.isEmpty) {
-      Widget emptyVideos = Expanded(
+    Widget? emptyVideos;
+
+    if (meetingProvider.currAttendees.length <= 1) {
+      emptyVideos = Expanded(
         child: Container(
           color: Colors.white,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              SvgPicture.asset(
+                'assets/video_empty.svg',
+                width: 262,
+                height: 262,
+              ),
+              const SizedBox(
+                height: 32,
+              ),
               const Text(
-                "Sem vídeo remoto aberto",
+                "Sem participantes",
                 style: TextStyle(
                   fontSize: 24,
                 ),
               ),
-              Icon(
-                Icons.videocam_off,
-                size: 94,
-                color: Colors.grey.withAlpha(500),
-              )
             ],
           ),
         ),
       );
+    } else if (videoTiles.isEmpty) {
+      emptyVideos = Expanded(
+        child: Container(
+          color: Colors.white,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                'assets/conversation.svg',
+                width: 192,
+                height: 192,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    if (emptyVideos != null) {
       listVideoTiles = [emptyVideos];
     } else {
       listVideoTiles = videoTiles;
