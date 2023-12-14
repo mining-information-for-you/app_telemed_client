@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:telemed_neurondata/interface/audio_devices_interface.dart';
 import 'package:telemed_neurondata/interface/audio_video_interface.dart';
 import 'package:telemed_neurondata/interface/realtime_interface.dart';
 import 'package:telemed_neurondata/interface/video_tile_interface.dart';
 import 'package:telemed_neurondata/response_enums.dart';
-import 'package:provider/provider.dart';
 
 import '../api.dart';
 import '../attendee.dart';
@@ -27,6 +27,7 @@ class MeetingViewModel extends ChangeNotifier
   String? localAttendeeId;
   String? remoteAttendeeId;
   String? contentAttendeeId;
+  bool openedVideoOnConnect = false;
 
   String? selectedAudioDevice;
   bool? changedSelectedAudioDevice;

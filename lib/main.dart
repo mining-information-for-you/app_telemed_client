@@ -41,8 +41,7 @@ class MyApp extends StatelessWidget {
             routes: [
               GoRoute(
                 path: '/',
-                // builder: (context, state) => JoinMeetingView(),
-                builder: (context, state) => const ThanksView(),
+                builder: (context, state) => JoinMeetingView(),
               ),
               GoRoute(
                 path: '/thanks',

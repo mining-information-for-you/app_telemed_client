@@ -5,12 +5,12 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:telemed_neurondata/view_models/meeting_view_model.dart';
 import 'package:telemed_neurondata/views/screenshare.dart';
-import 'package:provider/provider.dart';
 import 'package:telemed_neurondata/views/thanks.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../logger.dart';
 
@@ -30,7 +30,17 @@ class MeetingView extends StatelessWidget {
 
     if (!meetingProvider.isMeetingActive) {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => const ThanksView()));
+        context,
+        MaterialPageRoute(builder: (context) => const ThanksView()),
+      );
+    } else {
+      if (meetingProvider
+                  .currAttendees[meetingProvider.localAttendeeId!]!.isVideoOn ==
+              false &&
+          meetingProvider.openedVideoOnConnect == false) {
+        meetingProvider.sendLocalVideoTileOn();
+        meetingProvider.openedVideoOnConnect = true;
+      }
     }
 
     displayVideoTiles(
