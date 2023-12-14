@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:telemed_neurondata/method_channel_coordinator.dart';
-import 'package:provider/provider.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:provider/provider.dart';
+import 'package:telemed_neurondata/method_channel_coordinator.dart';
 
 import '../view_models/join_meeting_view_model.dart';
 import '../view_models/meeting_view_model.dart';
@@ -31,136 +32,134 @@ class JoinMeetingView extends StatelessWidget {
     hashRoomTEC.value = TextEditingValue(text: (tokenCall ?? '').trim());
 
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            alignment: Alignment.centerLeft,
-            height: size.height,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF92ABFB),
-                  Color(0xFF3360F6),
-                ],
-              ),
-            ),
-            child: Image.asset('assets/background.png'),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 52, horizontal: 32),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 52, horizontal: 32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Header
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                // Header
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Image.asset('assets/logo.png'),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 14),
-                      child: Text(
-                        "Tele-Consulta",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
+                SvgPicture.asset(
+                  'assets/logo-ha.svg',
+                  height: 92,
                 ),
-
-                // Formulários
-                Column(
-                  children: [
-                    TextField(
-                      controller: hashRoomTEC,
-                      inputFormatters: [maskFormatter],
-                      style: const TextStyle(
-                        color: Color(0xFF2a2a2a),
-                      ),
-                      decoration: const InputDecoration(
-                        labelText: "Código da sala",
-                        labelStyle: TextStyle(
-                          color: Colors.grey,
-                        ),
-                        floatingLabelBehavior: FloatingLabelBehavior.never,
-                        floatingLabelStyle: TextStyle(
-                          color: Colors.white,
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(width: 2, color: Colors.white),
-                          borderRadius: BorderRadius.all(Radius.circular(12)),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(width: 2, color: Colors.white),
-                          borderRadius: BorderRadius.all(Radius.circular(12)),
-                        ),
-                      ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 14),
+                  child: Text(
+                    "Tele-Consulta",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF0064C6),
                     ),
-                    const SizedBox(
-                      height: 24,
-                    ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFEBEAFB),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 40,
-                          vertical: 16,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onPressed: () async {
-                        // Hide Keyboard
-                        FocusManager.instance.primaryFocus?.unfocus();
-
-                        if (joinMeetingProvider.loadingStatus == false) {
-                          handleJoinMeeting(
-                            joinMeetingProvider,
-                            methodChannelProvider,
-                            meetingProvider,
-                            context,
-                          );
-                        }
-                      },
-                      child: joinMeetingProvider.loadingStatus
-                          ? const SizedBox(
-                              height: 22,
-                              width: 22,
-                              child: CircularProgressIndicator(
-                                color: Color(0xFF2a2a2a),
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : const Text(
-                              "Entrar",
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Color(0xFF2a2a2a),
-                              ),
-                            ),
-                    ),
-                  ],
-                ),
-
-                // Footer
-                const Text(
-                  'www.neurondata.com.br',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
                   ),
                 ),
               ],
             ),
-          )
-        ],
+
+            // Formulários
+            Column(
+              children: [
+                TextField(
+                  controller: hashRoomTEC,
+                  inputFormatters: [maskFormatter],
+                  style: const TextStyle(
+                    color: Color(0xFF0064C6),
+                  ),
+                  decoration: const InputDecoration(
+                    labelText: "Código da sala",
+                    labelStyle: TextStyle(
+                      color: Color(0xFF0064C6),
+                    ),
+                    floatingLabelBehavior: FloatingLabelBehavior.never,
+                    floatingLabelStyle: TextStyle(
+                      color: Colors.white,
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    enabledBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(width: 1, color: Color(0xFF0064C6)),
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(width: 1, color: Color(0xFF0064C6)),
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 24,
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0064C6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 40,
+                      vertical: 16,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: () async {
+                    // Hide Keyboard
+                    FocusManager.instance.primaryFocus?.unfocus();
+
+                    if (joinMeetingProvider.loadingStatus == false) {
+                      handleJoinMeeting(
+                        joinMeetingProvider,
+                        methodChannelProvider,
+                        meetingProvider,
+                        context,
+                      );
+                    }
+                  },
+                  child: joinMeetingProvider.loadingStatus
+                      ? const SizedBox(
+                          height: 22,
+                          width: 22,
+                          child: CircularProgressIndicator(
+                            color: Color(0xFFEBEAFB),
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          "Entrar",
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Color(0xFFEBEAFB),
+                          ),
+                        ),
+                ),
+              ],
+            ),
+
+            // Footer
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Powered by',
+                  style: TextStyle(
+                    color: Color(0xFF0064C6),
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(
+                  width: 8,
+                ),
+                Image.asset(
+                  'assets/logo.png',
+                  height: 28,
+                ),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }

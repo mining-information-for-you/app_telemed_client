@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:telemed_neurondata/view_models/join_meeting_view_model.dart';
 import 'package:telemed_neurondata/view_models/meeting_view_model.dart';
 import 'package:telemed_neurondata/views/join_meeting.dart';
 import 'package:telemed_neurondata/views/meeting.dart';
-import 'package:provider/provider.dart';
 import 'package:telemed_neurondata/views/thanks.dart';
 
 import 'method_channel_coordinator.dart';
@@ -41,12 +41,12 @@ class MyApp extends StatelessWidget {
             routes: [
               GoRoute(
                 path: '/',
-                builder: (context, state) => JoinMeetingView(),
+                // builder: (context, state) => JoinMeetingView(),
+                builder: (context, state) => const ThanksView(),
               ),
               GoRoute(
                 path: '/thanks',
-                // ignore: prefer_const_constructors
-                builder: (context, state) => ThanksView(),
+                builder: (context, state) => const ThanksView(),
               ),
               GoRoute(
                 path: '/room/:tokenCall',
