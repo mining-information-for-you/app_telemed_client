@@ -1,4 +1,4 @@
-package com.neurondata.telemed_neurondata
+package com.neurondata.telemed_ha
 
 import androidx.annotation.NonNull
 import io.flutter.embedding.android.FlutterActivity

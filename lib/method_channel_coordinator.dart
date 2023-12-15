@@ -12,7 +12,7 @@ import 'video_tile.dart';
 
 class MethodChannelCoordinator extends ChangeNotifier {
   final MethodChannel methodChannel =
-      const MethodChannel("com.neurondata.telemed_neurondata.methodChannel");
+      const MethodChannel("com.neurondata.telemed_ha.methodChannel");
 
   RealtimeInterface? realtimeObserver;
   VideoTileInterface? videoTileObserver;

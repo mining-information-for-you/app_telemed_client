@@ -1,4 +1,4 @@
-package com.neurondata.telemed_neurondata
+package com.neurondata.telemed_ha
 
 enum class Response(val msg: String) {
     // Authorization

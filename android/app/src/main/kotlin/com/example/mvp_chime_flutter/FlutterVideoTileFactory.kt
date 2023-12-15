@@ -1,4 +1,4 @@
-package com.neurondata.telemed_neurondata
+package com.neurondata.telemed_ha
 
 import android.content.Context
 import io.flutter.plugin.common.StandardMessageCodec

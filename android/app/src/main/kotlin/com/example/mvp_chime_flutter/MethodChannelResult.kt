@@ -1,4 +1,4 @@
-package com.neurondata.telemed_neurondata
+package com.neurondata.telemed_ha
 
 class MethodChannelResult(val result: Boolean, val arguments: Any?) {
 

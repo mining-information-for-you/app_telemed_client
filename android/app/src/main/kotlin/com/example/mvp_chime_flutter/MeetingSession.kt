@@ -1,4 +1,4 @@
-package com.neurondata.telemed_neurondata
+package com.neurondata.telemed_ha
 
 import com.amazonaws.services.chime.sdk.meetings.session.DefaultMeetingSession
 import com.amazonaws.services.chime.sdk.meetings.audiovideo.AudioVideoObserver

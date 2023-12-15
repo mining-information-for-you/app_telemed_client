@@ -52,7 +52,7 @@ Segue o arquivo configurado deste aplicativo:
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "telemed_neurondata",
-      "package_name": "com.neurondata.telemed_neurondata",
+      "package_name": "com.neurondata.telemed_ha",
       "sha256_cert_fingerprints": [
         "36:11:C2:64:87:D6:95:23:24:3E:B3:E9:52:F8:6A:5B:64:6D:8A:EB:73:94:09:39:DE:5A:E7:4B:17:33:9F:37"
       ]
